@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vacas Verificadas</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #8B4513;
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            text-align: center;
+            color: gold;
+        }
+        button {
+            background: green;
+            color: white;
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: none;
+        }
+        .tab { display: none; }
+        .tab.active { display: block; }
+        .cow {
+            background: tan;
+            color: black;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>VACAS VERIFICADAS</h1>
+    
+    <div id="setup">
+        <label>Región:</label>
+        <select id="region">
+            <option>México</option>
+            <option>USA</option>
+        </select>
+        <label>Rancho:</label>
+        <input id="rancho" placeholder="Rancho Rudy">
+        <button onclick="setup()">Continuar</button>
+    </div>
+
+    <div id="main" class="tab">
+        <h2>Menú Principal</h2>
+        <button onclick="showTab('add')">+ Añadir Vaca</button>
+        <button onclick="showTab('health')">Salud & Vacunas</button>
+        <button onclick="showTab('market')">Marketplace</button>
+        <button onclick="showTab('move')">Movimientos</button>
+    </div>
+
+    <div id="add" class="tab">
+        <h2>+ Añadir Vaca</h2>
+        <input id="tag" placeholder="Tag (001)">
+        <input id="name" placeholder="Nombre (Rudy)">
+        <select id="sex">
+            <option>Toro</option>
+            <option>Vaca</option>
+            <option>Novillo</option>
+        </select>
+        <input id="breed" placeholder="Raza % (Beefmaster 80%)">
+        <input id="birth" type="date" placeholder="Nacimiento">
+        <select id="ranch">
+            <option>Jalisco</option>
+            <option>Sonora</option>
+        </select>
+        <button onclick="addCow()">Guardar</button>
+        <div id="cows"></div>
+    </div>
+
+    <div id="health" class="tab">
+        <h2>Salud & Vacunas</h2>
+        <select id="cowHealth"></select>
+        <input id="vaccine" placeholder="Tipo (BVD)">
+        <input id="vdate" type="date">
+        <button onclick="addVaccine()">Añadir</button>
+        <div id="vaccines"></div>
+    </div>
+
+    <div id="market" class="tab">
+        <h2>Marketplace</h2>
+        <select id="cowMarket"></select>
+        <input id="price" placeholder="Precio (9800 MXN)">
+        <button onclick="sellCow()">Listar</button>
+        <div id="sales"></div>
+    </div>
+
+    <div id="move" class="tab">
+        <h2>Movimientos</h2>
+        <select id="cowMove"></select>
+        <select id="newRanch">
+            <option>Jalisco</option>
+            <option>Sonora</option>
+        </select>
+        <button onclick="moveCow()">Mover</button>
+        <div id="moves"></div>
+    </div>
+
+    <script>
+        let cows = [];
+        let vaccines = [];
+        let sales = [];
+        let moves = [];
+
+        function setup() {
+            let region = document.getElementById('region').value;
+            let rancho = document.getElementById('rancho').value;
+            if (rancho) {
+                document.getElementById('setup').style.display = 'none';
+                document.getElementById('main').style.display = 'block';
+                document.getElementById('ranch').innerHTML = '<option>' + rancho + '</option>';
+            }
+        }
+
+        function showTab(tab) {
+            for (let t of ['add', 'health', 'market', 'move']) {
+                document.getElementById(t).classList.remove('active');
+            }
+            document.getElementById(tab).classList.add('active');
+        }
+
+        function addCow() {
+            const tag = document.getElementById('tag').value;
+            const name = document.getElementById('name').value;
+            const sex = document.getElementById('sex').value;
+            const breed = document.getElementById('breed').value;
+            const birth = document.getElementById('birth').value;
+            const ranch = document.getElementById('ranch').value;
+
+            if (tag && name) {
+                const cow = { tag, name, sex, breed, birth, ranch };
+                cows.push(cow);
+                document.getElementById('cows').innerHTML += `
+                    <div class="cow">
+                        <b>${name}</b> (${tag})<br>
+                        ${sex} - ${breed}<br>
+                        Nacido: ${birth}<br>
+                        Rancho: ${ranch}
+                    </div>`;
+                
+                // Update dropdowns
+                updateCowLists();
+            }
+        }
+
+        function updateCowLists() {
+            const cowNames = cows.map(c => `<option>${c.name}</option>`).join('');
+            document.getElementById('cowHealth').innerHTML = cowNames;
+            document.getElementById('cowMarket').innerHTML = cowNames;
+            document.getElementById('cowMove').innerHTML = cowNames;
+        }
+
+        function addVaccine() {
+            const cow = document.getElementById('cowHealth').value;
+            const vaccine = document.getElementById('vaccine').value;
+            const date = document.getElementById('vdate').value;
+            if (cow && vaccine && date) {
+                vaccines.push({ cow, vaccine, date });
+                document.getElementById('vaccines').innerHTML += `
+                    <div>${cow}: ${vaccine} (${date})</div>`;
+            }
+        }
+
+        function sellCow() {
+            const cow = document.getElementById('cowMarket').value;
+            const price = document.getElementById('price').value;
+            if (cow && price) {
+                sales.push({ cow, price });
+                document.getElementById('sales').innerHTML += `
+                    <div>${cow}: ${price}</div>`;
+            }
+        }
+
+        function moveCow() {
+            const cow = document.getElementById('cowMove').value;
+            const newRanch = document.getElementById('newRanch').value;
+            if (cow && newRanch) {
+                moves.push({ cow, newRanch });
+                document.getElementById('moves').innerHTML += `
+                    <div>${cow} → ${newRanch}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
