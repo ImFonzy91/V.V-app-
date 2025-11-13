@@ -1,0 +1,16 @@
+{
+  "name": "Vacas Verificadas",
+  "short_name": "V.V.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#8B4513",
+  "theme_color": "#8B4513",
+  "description": "Registro y manejo de vacas verificadas.",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
